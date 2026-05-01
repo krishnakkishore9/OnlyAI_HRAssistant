@@ -78,3 +78,20 @@ You are currently using **Ethereal** (Nodemailer) for testing emails.
 > [!NOTE]
 > Serverless platforms like Vercel sometimes block standard SMTP outbound ports (like port 587 or 25) to prevent spam.
 > If your emails stop sending in production, you should switch from Nodemailer to a modern API-based provider like **[Resend](https://resend.com/)**, **SendGrid**, or **Postmark**. Resend is particularly recommended for Next.js as it uses standard HTTPS to send emails, completely bypassing SMTP port restrictions.
+---
+
+## 🛠️ Troubleshooting
+
+### Why is my Vercel app showing the default "Next.js" page?
+If you see the default Next.js starter page instead of the HR Assistant, it usually means your actual code files weren't pushed to GitHub.
+- **The Fix:** Ensure you use `git add .` (with the dot) to stage **all** files before committing. If you only added the README, the rest of the project will be missing from the deployment.
+- Run these commands to fix it:
+  ```bash
+  git add .
+  git commit -m "Fix: Push all project files"
+  git push origin main
+  ```
+
+### Firebase "Private Key" Errors
+If you see an error like `error:0909006C:PEM routines:get_name:no start line`, it means your `FIREBASE_PRIVATE_KEY` environment variable in Vercel is not formatted correctly.
+- **The Fix:** Go to Vercel settings, find the variable, and make sure the `\n` characters are handled correctly (or wrap the entire key in double quotes).

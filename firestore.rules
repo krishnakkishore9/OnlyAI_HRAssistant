@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper to check if user is admin
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin(); // Only admins can update balances/roles directly
+    }
+
+    // Leave Requests
+    match /leave_requests/{requestId} {
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if request.auth != null; // Requests are created via API usually, but this allows secure SDK usage
+      allow update, delete: if isAdmin();
+    }
+
+    // Audit Logs
+    match /logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if request.auth != null; // Allow logging from authenticated sessions
+    }
+
+    // Policy Embeddings (Read only for authenticated users)
+    match /policy_embeddings/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+  }
+}
